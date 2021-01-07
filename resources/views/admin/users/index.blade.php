@@ -11,7 +11,26 @@
         </div>
         
         <div class="col-md-5">
-            heree
+            <form method="post" action="{{ route('file.upload') }}" enctype="multipart/form-data">
+                @csrf
+                <div class="row">
+                    <div class="col-md-10">
+                        <div class="form-group">
+                            {!! Form::label('file', 'Upload CSV*', array('class'=>'col-sm-3 control-label')) !!}
+                            <div class="col-sm-9">
+                                {!! Form::file('csvfile') !!}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <div class="col-sm-10 col-sm-offset-2">
+                              {!! Form::submit( trans('coreadmin::templates.templates-view_create-create') , array('class' => 'btn btn-primary')) !!}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
     

@@ -15,3 +15,4 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::POST('file/csvupload' , ['as' => 'file.upload' , 'uses' => 'UsersController@uploadCSV']);

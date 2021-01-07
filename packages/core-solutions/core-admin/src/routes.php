@@ -119,7 +119,7 @@ Route::group([
     ], function () {
         Route::resource('users', 'UsersController');
         Route::resource('roles', 'RolesController');
-    Route::POST('/file/csvupload' , ['as' => 'file.upload' , 'uses' => 'UsersController@uploadCSV']);
+    
         
     });
     Route::auth();

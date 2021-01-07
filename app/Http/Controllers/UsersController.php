@@ -175,37 +175,51 @@ class UsersController extends Controller
     }
     
     public function uploadCSV(Request $request){
-        dd($request->all());
-    //     $file = $request->file('csvfile');
-        
-    //     $filename = $file->getClientOriginalName();
-    //     $fileExtn = $file->getClientOriginalExtension();
-        
-    //     if( $fileExtn == 'csv' ){
-    //         $destinationPath = 'uploads';
-    //         $file->move($destinationPath,$file->getClientOriginalName());
-    //     }
-    //     dd(asset('uploads/'.$filename));
-    //     if (!file_exists($filename) || !is_readable($filename)){
-    //         return FALSE;
-    //     }else{
-    //         $header = NULL;
-    // 		$data = array();
-    // 		if (($handle = fopen($filename, 'r')) !== FALSE) {
-    // 			while (($row = fgetcsv($handle, 1000, $delimiter)) !== FALSE) {
-    // 				if (!$header){
-    // 				    $header = $row;
-    // 				}else{
-    // 				    $data[] = array_combine($header, $row);
-    // 				}
-    // 			}
-    // 			fclose($handle);
-    // 		}
-    // 		return $data;
-    //     }
-			
 
-		
+        $file = $request->file('csvfile');
+        
+        $filename = $file->getClientOriginalName();
+        $fileExtn = $file->getClientOriginalExtension();
+        
+        if( $fileExtn == 'csv' ){
+            $destinationPath = 'uploads';
+            $file->move($destinationPath,$file->getClientOriginalName());
+        }
+
+        if ( !file_exists('uploads/'.$filename) ){
+            return FALSE;
+        }else{
+            $header = NULL;
+    		$data = array();
+    		if (($handle = fopen('uploads/'.$filename, 'r')) !== FALSE) {
+    			while (($row = fgetcsv($handle, 1000, ',')) !== FALSE) {
+    				if (!$header){
+    				    $header = $row;
+    				}else{
+    				    $data[] = array_combine($header, $row);
+    				}
+    			}
+    			fclose($handle);
+    		}
+
+            foreach ($data as $key => $value) {
+                $value['normalPassword'] = $value['password'];
+                $value['password'] = Hash::make($value['password']);
+
+                $user = User::create($value);
+                $userId = $user->id;
+
+                $divisions = explode(',', $value['division']);
+                foreach( $divisions as $k => $v ){
+                    $division = DivisionMap::create([
+                        'user_id' => $userId,
+                        'division_id' => $v
+                    ]);
+                }  
+            }
+            return redirect()->route('users.index')->withMessage(trans('coreadmin::admin.users-controller-successfully_created'));
+        }
+        return redirect()->route('users.index')->withErrors(["CSV File is not correct."]);
     }
     
 //     public function csv_to_array($filename = '', $delimiter = ',') {
